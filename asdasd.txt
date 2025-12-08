@@ -1,0 +1,50 @@
+Voy a explicarte pasos claros y comandos para convertir y ejecutar tu programa como una aplicación de escritorio en Windows: crear un JAR ejecutable, ejecutarlo doble‑clic o con javaw, y opciones para empaquetarlo como .exe/instalador. Dime si quieres que lo haga yo aquí y cree el JAR/instalador.
+
+Requisitos
+
+Tener instalado JDK (recomiendo JDK 11+).
+Asegúrate de que javac, java (y jpackage si usarás ese camino) estén en el PATH.
+Compilar (clases .class)
+
+Abre PowerShell en Tempo y ejecuta:
+Esto generará TimerCircle.class y clases internas.
+Crear un JAR ejecutable (simple)
+
+Crea un archivo manifest.txt con esta línea y una línea en blanco al final:
+Empaqueta el JAR:
+Ejecutar (con consola):
+Ejecutar sin consola (ventana de GUI solo) — usa javaw:
+Si asocias .jar con Java en Windows, un doble‑clic sobre TimerCircle.jar también lo ejecutará (si usa javaw por asociación).
+Crear un acceso directo en el Escritorio (usa javaw para no abrir consola)
+Ejecuta este script en PowerShell (ajusta rutas si hace falta):
+
+Empaquetar como .exe o instalador (opciones)
+
+Opción recomendada moderna: jpackage (JDK 14+). Crea .exe o instalador con runtime incluido.
+Ejemplo:
+Notas:
+
+--input apunta al directorio que contiene TimerCircle.jar (y otras dependencias).
+
+--type puede ser exe, msi, etc.
+
+jpackage empaqueta un runtime (JRE) por defecto, así el usuario no necesita Java instalado.
+
+Requiere JDK que incluya jpackage (OpenJDK11+ con herramientas o Oracle JDK).
+
+Alternativa clásica: Launch4j para crear un .exe que lance el JAR; luego empacar en un instalador con Inno Setup o similar.
+
+Distribución
+
+Si usas JAR: distribuir TimerCircle.jar + instrucciones para ejecutar con javaw.
+Si usas jpackage: distribuirás un instalador/EXE que instala la aplicación como cualquier otra app de Windows.
+Sugerencias útiles
+
+Usa javaw.exe en accesos directos para evitar consola visible.
+Si quieres icono en la ventana y en el EXE, crea icono.ico y pásalo a jpackage o configúralo en Launch4j.
+Para actualizar el programita fácilmente, crea un pequeño script build.ps1 que compile y cree el JAR automáticamente.
+¿Quieres que:
+
+genere aquí el jar ejecutable y el acceso directo para probar?,
+o que prepare un build.ps1 con los comandos y un ejemplo de manifest.txt para que lo ejecutes localmente?,
+o que use jpackage para crear un .exe (necesito saber si tienes JDK con jpackage disponible)?
