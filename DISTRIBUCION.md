@@ -20,10 +20,12 @@ Esto generará el archivo: `target/TimerCircle-1.0.0.jar`
 El archivo `target/TimerCircle-1.0.0.jar` es todo lo que necesitan los usuarios.
 
 **Ventajas:**
+
 - Archivo pequeño (~60 KB)
 - Funciona en cualquier SO con Java
 
 **Desventajas:**
+
 - Requiere que el usuario tenga Java instalado
 
 ### Opción B: Crear un Instalador Windows (Avanzado)
@@ -74,7 +76,7 @@ InstallDir "$PROGRAMFILES\Temporizador"
 Section "Instalar"
     SetOutPath "$INSTDIR"
     File "target\TimerCircle-1.0.0.jar"
-    
+
     CreateDirectory "$SMPROGRAMS\Temporizador"
     CreateShortcut "$SMPROGRAMS\Temporizador\Temporizador.lnk" \
                    "javaw.exe" \
@@ -100,6 +102,7 @@ SectionEnd
 ### Para ejecutar la aplicación:
 
 **Opción 1: Si tienes Java instalado**
+
 ```bash
 java -jar TimerCircle-1.0.0.jar
 ```
@@ -147,15 +150,18 @@ chmod +x run.sh
 ## 📤 Cómo Compartir
 
 1. **Por correo electrónico:**
+
    - Adjunta `TimerCircle-1.0.0.jar`
    - Incluye instrucciones de requisitos
 
 2. **Por Google Drive/Dropbox:**
+
    - Sube el JAR
    - Comparte el enlace
    - Abre acceso público
 
 3. **Por GitHub:**
+
    ```bash
    git push origin main
    # Los usuarios pueden descargar el código y compilar
@@ -178,6 +184,7 @@ chmod +x run.sh
 Proporciona instrucciones de instalación de Java para usuarios sin experiencia:
 
 **Windows:**
+
 1. Visita https://www.java.com/es/download/
 2. Descarga "Java Runtime Environment"
 3. Ejecuta el instalador
@@ -185,12 +192,14 @@ Proporciona instrucciones de instalación de Java para usuarios sin experiencia:
 5. Verifica: abre PowerShell y escribe `java -version`
 
 **macOS:**
+
 ```bash
 # Usando Homebrew
 brew install openjdk@11
 ```
 
 **Linux:**
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install openjdk-11-jre

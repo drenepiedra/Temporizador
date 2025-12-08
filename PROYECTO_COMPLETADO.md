@@ -6,17 +6,17 @@ Tu proyecto Java ahora es una **aplicación de escritorio ejecutable en cualquie
 
 ### Archivos principales creados:
 
-| Archivo | Descripción |
-|---------|-------------|
-| `target/TimerCircle-1.0.0.jar` | ⭐ **Ejecutable final** - Aplicación lista para usar |
-| `pom.xml` | Configuración Maven (opcional) |
-| `build-simple.ps1` | Script para compilar sin Maven (Windows PowerShell) |
-| `build.ps1` / `build.sh` / `build.bat` | Scripts alternativos de compilación |
-| `run.ps1` / `run.sh` / `run.bat` | Scripts para ejecutar la aplicación |
-| `README.md` | Documentación completa del proyecto |
-| `DISTRIBUCION.md` | Guía para compartir la aplicación |
-| `INICIO_RAPIDO.md` | Guía de inicio rápido |
-| `.gitignore` | Configuración Git para ignorar archivos compilados |
+| Archivo                                | Descripción                                          |
+| -------------------------------------- | ---------------------------------------------------- |
+| `target/TimerCircle-1.0.0.jar`         | ⭐ **Ejecutable final** - Aplicación lista para usar |
+| `pom.xml`                              | Configuración Maven (opcional)                       |
+| `build-simple.ps1`                     | Script para compilar sin Maven (Windows PowerShell)  |
+| `build.ps1` / `build.sh` / `build.bat` | Scripts alternativos de compilación                  |
+| `run.ps1` / `run.sh` / `run.bat`       | Scripts para ejecutar la aplicación                  |
+| `README.md`                            | Documentación completa del proyecto                  |
+| `DISTRIBUCION.md`                      | Guía para compartir la aplicación                    |
+| `INICIO_RAPIDO.md`                     | Guía de inicio rápido                                |
+| `.gitignore`                           | Configuración Git para ignorar archivos compilados   |
 
 ---
 
@@ -55,11 +55,13 @@ mvn clean package
 ## 📋 Requisitos para ejecutar
 
 ### Para usuarios finales:
+
 - **Java Runtime Environment (JRE) 11+**
   - Descargar: https://www.java.com/es/download/
   - Verificar: `java -version` en terminal
 
 ### Para desarrolladores (compilar desde código):
+
 - **Java Development Kit (JDK) 11+**
   - Descargar: https://www.oracle.com/java/technologies/downloads/
   - Verificar: `javac -version` en terminal
@@ -82,12 +84,15 @@ mvn clean package
 ## 📤 Distribuir a otros usuarios
 
 ### Opción simple: Enviar el JAR
+
 1. Comparte el archivo `target/TimerCircle-1.0.0.jar`
 2. El usuario ejecuta: `java -jar TimerCircle-1.0.0.jar`
 3. Requiere Java instalado
 
 ### Opción avanzada: Crear ejecutable Windows
+
 Consulta `DISTRIBUCION.md` para:
+
 - Crear instalador NSIS
 - Empaquetar con JPackage
 - Usar Launch4j para crear `.exe`
@@ -97,12 +102,14 @@ Consulta `DISTRIBUCION.md` para:
 ## 🔧 Modificar la aplicación
 
 ### Para cambiar algo:
+
 1. Edita `TimerCircle.java` en tu editor favorito
 2. Recompila: `.\build-simple.ps1` (o `.\build.ps1`)
 3. Prueba: `java -jar target\TimerCircle-1.0.0.jar`
 4. Distribuye el JAR actualizado
 
 ### Cambios comunes:
+
 - **Título ventana**: Línea 23 - `setTitle("..."`
 - **Tiempo por defecto**: Línea 42 - `inputSeconds.setText("25")`
 - **Tamaño ventana**: Línea 25 - `setMinimumSize(new Dimension(...)`
@@ -143,6 +150,7 @@ Temporizador/
 ## 🎉 ¡Listo para usar!
 
 Tu aplicación es ahora:
+
 - ✅ Independiente (puede compartirse)
 - ✅ Multiplataforma (Windows, macOS, Linux)
 - ✅ Ejecutable (no requiere código fuente)

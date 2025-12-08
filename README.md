@@ -14,10 +14,12 @@ Aplicación de escritorio multiplataforma para medir tiempos de concentración c
 ## 📋 Requisitos Previos
 
 ### Para ejecutar la aplicación:
+
 - **Java Runtime Environment (JRE) 11 o superior**
   - Descargar: https://www.java.com/es/download/
 
 ### Para compilar desde código fuente:
+
 - **Java Development Kit (JDK) 11 o superior**
   - Descargar: https://www.oracle.com/java/technologies/downloads/
 - **Maven 3.6 o superior**
@@ -67,11 +69,13 @@ java -jar target/TimerCircle-1.0.0.jar
 6. **Sonará una alerta** cuando termine el tiempo
 
 ### Opciones:
+
 - ☑️ **Siempre encima** - Mantiene la ventana visible sobre otras aplicaciones
 
 ## 📦 Distribución de la Aplicación
 
 El archivo compilado `TimerCircle-1.0.0.jar` es portable y puede ser:
+
 - Compartido entre usuarios
 - Incluido en un instalador
 - Ejecutado en cualquier ordenador con Java 11+
@@ -100,6 +104,7 @@ Para modificar el proyecto:
 3. Distribuye el nuevo JAR
 
 ### Cambios comunes:
+
 - **Título de la ventana**: Línea `setTitle("Temporizador de concentración")`
 - **Tiempo por defecto**: Línea `inputSeconds.setText("25")`
 - **Tamaño de ventana**: Línea `setMinimumSize(new Dimension(300, 320))`
@@ -111,6 +116,7 @@ Este proyecto es de código abierto.
 ## 🤝 Contribuciones
 
 Las contribuciones son bienvenidas. Por favor:
+
 1. Fork el proyecto
 2. Crea una rama para tu feature
 3. Realiza commit de tus cambios

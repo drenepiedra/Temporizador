@@ -3,12 +3,14 @@
 ## ⚡ Para usuarios sin experiencia técnica
 
 ### Paso 1: Instalar Java (si no lo tienes)
+
 1. Visita: https://www.java.com/es/download/
 2. Descarga "Java Runtime Environment"
 3. Ejecuta el instalador y sigue los pasos
 4. Reinicia tu ordenador
 
 ### Paso 2: Ejecutar la aplicación
+
 - **Windows:** Haz doble clic en `run.bat`
 - **macOS/Linux:** Abre terminal y escribe: `./run.sh`
 - **O cualquier SO:** `java -jar target/TimerCircle-1.0.0.jar`
@@ -18,11 +20,12 @@
 ## 👨‍💻 Para desarrolladores
 
 ### Compilar el proyecto:
+
 ```bash
 # Windows
 .\build.bat
 
-# macOS/Linux  
+# macOS/Linux
 ./build.sh
 
 # O con Maven directamente
@@ -30,6 +33,7 @@ mvn clean package
 ```
 
 ### Ejecutar después de compilar:
+
 ```bash
 # Windows
 .\run.bat
@@ -42,6 +46,7 @@ java -jar target/TimerCircle-1.0.0.jar
 ```
 
 ### Editar el código:
+
 1. Abre `TimerCircle.java` en tu editor favorito
 2. Haz los cambios que desees
 3. Recompila con los comandos anteriores
@@ -52,11 +57,13 @@ java -jar target/TimerCircle-1.0.0.jar
 ## ✅ Verificar que todo funciona
 
 Abre una terminal (PowerShell en Windows) y escribe:
+
 ```bash
 java -version
 ```
 
 Deberías ver algo como:
+
 ```
 java version "11.0.x" o superior
 ```
