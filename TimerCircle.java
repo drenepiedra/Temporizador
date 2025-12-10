@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class TimerCircle {
     public static void main(String[] args) {
@@ -16,20 +17,19 @@ class TimerCircleFrame extends JFrame {
     private final JButton startButton;
     private final JButton pauseButton;
     private final JButton resetButton;
+    private final JCheckBox shutdownCheckbox;
 
     public TimerCircleFrame() {
         setTitle("Temporizador de concentración");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(300, 320));
+        setMinimumSize(new Dimension(300, 380));
         setLocationRelativeTo(null);
 
-        // Default: ventana siempre encima activada. Añadimos un checkbox para controlarlo.
         setAlwaysOnTop(true);
 
         panel = new TimerPanel();
         add(panel, BorderLayout.CENTER);
 
-        // Controls responsive usando GridBagLayout
         JPanel controls = new JPanel(new GridBagLayout());
         controls.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         GridBagConstraints c = new GridBagConstraints();
@@ -48,7 +48,10 @@ class TimerCircleFrame extends JFrame {
         c.gridx = 0; c.gridy = 1; c.gridwidth = 2; c.weightx = 0;
         controls.add(alwaysOnTopCheckbox, c);
 
-        // Buttons row
+        shutdownCheckbox = new JCheckBox("Apagar PC al finalizar");
+        c.gridx = 0; c.gridy = 2; c.gridwidth = 2; c.weightx = 0;
+        controls.add(shutdownCheckbox, c);
+
         JPanel btns = new JPanel(new GridLayout(1, 3, 6, 0));
         startButton = new JButton("Iniciar");
         pauseButton = new JButton("Pausar");
@@ -57,59 +60,135 @@ class TimerCircleFrame extends JFrame {
         btns.add(pauseButton);
         btns.add(resetButton);
 
-        c.gridx = 0; c.gridy = 2; c.gridwidth = 2; c.weightx = 0;
+        c.gridx = 0; c.gridy = 3; c.gridwidth = 2; c.weightx = 0;
         controls.add(btns, c);
 
         add(controls, BorderLayout.SOUTH);
 
-        // Action listeners
         startButton.addActionListener(e -> {
             try {
                 int m = Integer.parseInt(inputSeconds.getText().trim());
                 if (m <= 0) throw new NumberFormatException();
-                panel.startTimer(m * 60L * 1000L);
+                
+                if (shutdownCheckbox.isSelected()) {
+                    int confirm = JOptionPane.showConfirmDialog(this,
+                        "⚠️ ADVERTENCIA ⚠️\n\n" +
+                        "La PC se APAGARÁ AUTOMÁTICAMENTE en " + m + " minutos.\n" +
+                        "No habrá más advertencias.\n" +
+                        "Guarda todo tu trabajo antes de iniciar.\n\n" +
+                        "¿Continuar?",
+                        "Confirmar apagado automático",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                    
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        panel.startTimer(m * 60L * 1000L, true);
+                    } else {
+                        shutdownCheckbox.setSelected(false);
+                        panel.startTimer(m * 60L * 1000L, false);
+                    }
+                } else {
+                    panel.startTimer(m * 60L * 1000L, false);
+                }
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Introduce minutos enteros (ej. 25 para 25 minutos).", "Entrada inválida", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, 
+                    "Introduce minutos enteros (ej. 25 para 25 minutos).", 
+                    "Entrada inválida", 
+                    JOptionPane.ERROR_MESSAGE);
             }
         });
 
         pauseButton.addActionListener(e -> panel.togglePause());
-        resetButton.addActionListener(e -> panel.reset());
+        resetButton.addActionListener(e -> {
+            panel.reset();
+            shutdownCheckbox.setSelected(false);
+        });
 
         pack();
     }
 }
 
 class TimerPanel extends JPanel {
-    private long totalMillis = 25L * 60L * 1000L; // default 25 min
+    private long totalMillis = 25L * 60L * 1000L;
     private long remainingMillis = totalMillis;
     private final javax.swing.Timer swingTimer;
     private boolean running = false;
     private boolean paused = false;
+    private boolean shutdownOnFinish = false;
 
     public TimerPanel() {
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(300, 180));
         swingTimer = new javax.swing.Timer(100, e -> {
             if (running && !paused) {
                 remainingMillis -= 100;
                 if (remainingMillis <= 0) {
                     remainingMillis = 0;
                     running = false;
-                    ((javax.swing.Timer) e.getSource()).stop();
+                
                     Toolkit.getDefaultToolkit().beep();
+                    
+                    // Apagar inmediatamente sin mostrar nada
+                    if (shutdownOnFinish) {
+                        shutdownComputerSilently();
+                    } else {
+                        // Solo beep si no va a apagar
+                        Toolkit.getDefaultToolkit().beep();
+                    }
                 }
                 repaint();
             }
         });
     }
 
-    public void startTimer(long totalMillis) {
+    public void startTimer(long totalMillis, boolean shutdownOnFinish) {
         this.totalMillis = totalMillis;
         this.remainingMillis = totalMillis;
         this.running = true;
         this.paused = false;
-        if (!swingTimer.isRunning()) swingTimer.start();
+        this.shutdownOnFinish = shutdownOnFinish;
+        
+        if (!swingTimer.isRunning()) {
+            swingTimer.start();
+        }
         repaint();
+    }
+
+    private void shutdownComputerSilently() {
+        String os = System.getProperty("os.name").toLowerCase();
+        String shutdownCommand;
+        
+        if (os.contains("win")) {
+            // Windows - apagar inmediatamente sin diálogos
+            shutdownCommand = "shutdown -s -f -t 0";
+        } else if (os.contains("mac") || os.contains("darwin")) {
+            // macOS - apagar inmediatamente
+            shutdownCommand = "sudo shutdown -h now";
+        } else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
+            // Linux/Unix - apagar inmediatamente
+            shutdownCommand = "sudo shutdown -h now";
+        } else {
+            // Si hay error, no mostrar nada, solo terminar
+            System.exit(0);
+            return;
+        }
+        
+        try {
+            if (os.contains("win")) {
+                // Para Windows, ejecutar directamente
+                Runtime.getRuntime().exec(shutdownCommand);
+            } else {
+                // Para sistemas Unix/Linux/macOS
+                String[] cmd = {"/bin/bash", "-c", shutdownCommand};
+                Runtime.getRuntime().exec(cmd);
+            }
+            
+            // Cerrar la aplicación inmediatamente sin mostrar nada
+            System.exit(0);
+                
+        } catch (IOException ex) {
+            // Si hay error, simplemente cerrar la aplicación sin mostrar nada
+            System.exit(0);
+        }
     }
 
     public void togglePause() {
@@ -121,8 +200,11 @@ class TimerPanel extends JPanel {
     public void reset() {
         running = false;
         paused = false;
+        shutdownOnFinish = false;
         remainingMillis = totalMillis;
-        if (swingTimer.isRunning()) swingTimer.stop();
+        if (swingTimer.isRunning()) {
+            swingTimer.stop();
+        }
         repaint();
     }
 
@@ -136,22 +218,24 @@ class TimerPanel extends JPanel {
         int x = (getWidth() - size) / 2;
         int y = (getHeight() - size) / 2;
 
-        // Background circle (unfilled)
         g2.setColor(new Color(240, 240, 240));
         g2.fillOval(x, y, size, size);
 
-        // Red arc representing remaining time
         double fraction = (totalMillis <= 0) ? 0.0 : (double) remainingMillis / (double) totalMillis;
         int angle = (int) Math.round(fraction * 360.0);
-        g2.setColor(new Color(200, 20, 20));
-        g2.fillArc(x, y, size, size, 90, -angle); // start at 12 o'clock, clockwise
+        
+        if (shutdownOnFinish && running) {
+            g2.setColor(new Color(220, 20, 60));
+        } else {
+            g2.setColor(new Color(200, 20, 20));
+        }
+        
+        g2.fillArc(x, y, size, size, 90, -angle);
 
-        // Optional inner circle to create a ring effect (looks nicer)
         int padding = Math.max(8, size / 6);
         g2.setColor(getBackground());
         g2.fillOval(x + padding, y + padding, size - padding * 2, size - padding * 2);
 
-        // Time text in center
         g2.setColor(Color.BLACK);
         String timeText = formatTime(remainingMillis);
         float fontSize = Math.max(18f, size / 8f);
@@ -162,12 +246,27 @@ class TimerPanel extends JPanel {
         int ty = getHeight() / 2 + fm.getAscent() / 2 - fm.getDescent() / 2;
         g2.drawString(timeText, tx, ty);
 
-        // Paused status
         if (paused) {
             g2.setFont(getFont().deriveFont(Font.PLAIN, 14f));
             String p = "Pausado";
             FontMetrics fm2 = g2.getFontMetrics();
             g2.drawString(p, getWidth() / 2 - fm2.stringWidth(p) / 2, ty + fm2.getHeight() + 6);
+        }
+        
+        if (shutdownOnFinish && running) {
+            g2.setColor(new Color(220, 0, 0));
+            g2.setFont(getFont().deriveFont(Font.BOLD, 12f));
+            String warningText = "⚠ APAGADO AUTOMÁTICO ACTIVADO ⚠";
+            FontMetrics fm3 = g2.getFontMetrics();
+            int textY = y + size + fm3.getHeight() + 2;
+            
+            g2.setColor(new Color(255, 240, 240));
+            int textWidth = fm3.stringWidth(warningText);
+            g2.fillRect(getWidth() / 2 - textWidth / 2 - 5, textY - fm3.getAscent() + 3, 
+                       textWidth + 10, fm3.getHeight());
+            
+            g2.setColor(new Color(200, 0, 0));
+            g2.drawString(warningText, getWidth() / 2 - textWidth / 2, textY);
         }
 
         g2.dispose();
