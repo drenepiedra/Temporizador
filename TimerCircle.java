@@ -4,6 +4,18 @@ import java.io.IOException;
 
 public class TimerCircle {
     public static void main(String[] args) {
+        // Configurar tema oscuro para diálogos
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            UIManager.put("OptionPane.background", new Color(0x15, 0x00, 0x3B));
+            UIManager.put("Panel.background", new Color(0x15, 0x00, 0x3B));
+            UIManager.put("OptionPane.messageForeground", Color.WHITE);
+            UIManager.put("Button.background", new Color(0x56, 0x00, 0xA7));
+            UIManager.put("Button.foreground", Color.WHITE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
         SwingUtilities.invokeLater(() -> {
             TimerCircleFrame frame = new TimerCircleFrame();
             frame.setVisible(true);
@@ -63,6 +75,29 @@ class TimerCircleFrame extends JFrame {
         c.gridx = 0; c.gridy = 3; c.gridwidth = 2; c.weightx = 0;
         controls.add(btns, c);
 
+        // Configurar colores de la interfaz
+        Color backgroundColor = new Color(0x15, 0x00, 0x3B);
+        Color buttonColor = new Color(0x56, 0x00, 0xA7);
+        Color buttonHoverColor = new Color(0x46, 0x00, 0x87);
+
+        // Fondo general
+        getContentPane().setBackground(backgroundColor);
+
+        // Fondo de controles
+        controls.setBackground(backgroundColor);
+        btns.setBackground(backgroundColor);
+
+        // Personalizar botones
+        customizeButton(startButton, buttonColor, buttonHoverColor);
+        customizeButton(pauseButton, buttonColor, buttonHoverColor);
+        customizeButton(resetButton, buttonColor, buttonHoverColor);
+
+        // Configurar colores de otros componentes
+        configureComponentColors(controls);
+
+        // Configurar panel del timer
+        panel.setBackground(backgroundColor);
+
         add(controls, BorderLayout.SOUTH);
 
         startButton.addActionListener(e -> {
@@ -106,6 +141,74 @@ class TimerCircleFrame extends JFrame {
 
         pack();
     }
+
+    private void customizeButton(JButton button, Color bgColor, Color hoverColor) {
+        button.setBackground(bgColor);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(new RoundedBorder(15, bgColor));
+        
+        // Efecto hover
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverColor);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(bgColor);
+            }
+        });
+    }
+
+    private void configureComponentColors(Container container) {
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof JLabel) {
+                comp.setForeground(Color.WHITE);
+                comp.setFont(comp.getFont().deriveFont(Font.BOLD));
+            } else if (comp instanceof JCheckBox) {
+                JCheckBox cb = (JCheckBox) comp;
+                cb.setForeground(Color.WHITE);
+                cb.setBackground(new Color(0x15, 0x00, 0x3B));
+                cb.setOpaque(false);
+                cb.setFocusPainted(false);
+            } else if (comp instanceof JTextField) {
+                comp.setBackground(new Color(0x25, 0x10, 0x5B));
+                comp.setForeground(Color.WHITE);
+                ((JTextField)comp).setCaretColor(Color.WHITE);
+                ((JTextField)comp).setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(0x56, 0x00, 0xA7), 1),
+                    BorderFactory.createEmptyBorder(5, 8, 5, 8)
+                ));
+            } else if (comp instanceof Container) {
+                configureComponentColors((Container)comp);
+            }
+        }
+    }
+
+    // Clase interna para bordes redondeados
+    class RoundedBorder implements javax.swing.border.Border {
+        private int radius;
+        private Color color;
+        
+        public RoundedBorder(int radius, Color color) {
+            this.radius = radius;
+            this.color = color;
+        }
+        
+        public Insets getBorderInsets(Component c) {
+            return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
+        }
+        
+        public boolean isBorderOpaque() {
+            return true;
+        }
+        
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            Graphics2D g2 = (Graphics2D)g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(color);
+            g2.drawRoundRect(x, y, width-1, height-1, radius, radius);
+        }
+    }
 }
 
 class TimerPanel extends JPanel {
@@ -118,6 +221,8 @@ class TimerPanel extends JPanel {
 
     public TimerPanel() {
         setPreferredSize(new Dimension(300, 180));
+        setBackground(new Color(0x15, 0x00, 0x3B));
+        
         swingTimer = new javax.swing.Timer(100, e -> {
             if (running && !paused) {
                 remainingMillis -= 100;
@@ -218,25 +323,29 @@ class TimerPanel extends JPanel {
         int x = (getWidth() - size) / 2;
         int y = (getHeight() - size) / 2;
 
-        g2.setColor(new Color(240, 240, 240));
+        // Fondo del círculo
+        g2.setColor(new Color(0x25, 0x10, 0x5B));
         g2.fillOval(x, y, size, size);
 
+        // Arco del temporizador
         double fraction = (totalMillis <= 0) ? 0.0 : (double) remainingMillis / (double) totalMillis;
         int angle = (int) Math.round(fraction * 360.0);
         
         if (shutdownOnFinish && running) {
-            g2.setColor(new Color(220, 20, 60));
+            g2.setColor(new Color(0xFF, 0x00, 0x40)); // Rojo brillante para apagado
         } else {
-            g2.setColor(new Color(200, 20, 20));
+            g2.setColor(new Color(0x13, 0x04, 0x4C)); // Morado oscuro #13044C para normal
         }
         
         g2.fillArc(x, y, size, size, 90, -angle);
 
+        // Círculo interior
         int padding = Math.max(8, size / 6);
-        g2.setColor(getBackground());
+        g2.setColor(new Color(0x15, 0x00, 0x3B)); // Fondo #15003B
         g2.fillOval(x + padding, y + padding, size - padding * 2, size - padding * 2);
 
-        g2.setColor(Color.BLACK);
+        // Texto del tiempo
+        g2.setColor(Color.WHITE);
         String timeText = formatTime(remainingMillis);
         float fontSize = Math.max(18f, size / 8f);
         Font font = getFont().deriveFont(Font.BOLD, fontSize);
@@ -246,26 +355,31 @@ class TimerPanel extends JPanel {
         int ty = getHeight() / 2 + fm.getAscent() / 2 - fm.getDescent() / 2;
         g2.drawString(timeText, tx, ty);
 
+        // Texto de pausado
         if (paused) {
             g2.setFont(getFont().deriveFont(Font.PLAIN, 14f));
             String p = "Pausado";
             FontMetrics fm2 = g2.getFontMetrics();
+            g2.setColor(Color.WHITE);
             g2.drawString(p, getWidth() / 2 - fm2.stringWidth(p) / 2, ty + fm2.getHeight() + 6);
         }
         
+        // Indicador de apagado automático
         if (shutdownOnFinish && running) {
-            g2.setColor(new Color(220, 0, 0));
+            g2.setColor(new Color(0xFF, 0x60, 0x60));
             g2.setFont(getFont().deriveFont(Font.BOLD, 12f));
             String warningText = "⚠ APAGADO AUTOMÁTICO ACTIVADO ⚠";
             FontMetrics fm3 = g2.getFontMetrics();
             int textY = y + size + fm3.getHeight() + 2;
             
-            g2.setColor(new Color(255, 240, 240));
+            // Fondo del texto de advertencia
+            g2.setColor(new Color(0x25, 0x00, 0x4B, 200));
             int textWidth = fm3.stringWidth(warningText);
             g2.fillRect(getWidth() / 2 - textWidth / 2 - 5, textY - fm3.getAscent() + 3, 
                        textWidth + 10, fm3.getHeight());
             
-            g2.setColor(new Color(200, 0, 0));
+            // Texto de advertencia
+            g2.setColor(new Color(0xFF, 0x80, 0x80));
             g2.drawString(warningText, getWidth() / 2 - textWidth / 2, textY);
         }
 
